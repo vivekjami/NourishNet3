@@ -1,0 +1,16 @@
+{
+  "name": "nourishnet_3",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+
+  "description": "NourishNet3 leverages blockchain technology to create a transparent and efficient system for food donations. \nThe platform connects donors, recipients, and food providers, aiming to revolutionize the way we address food insecurity.",
+  "dependencies": {
+    "@solana/web3.js": "^1.78.3",
+    "borsh": "^1.0.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
