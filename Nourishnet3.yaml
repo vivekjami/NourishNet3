@@ -1,0 +1,182 @@
+cidl: "0.8"
+info:
+  name: nourishnet3
+  title: NourishNet3 Food Aid Platform
+  summary: |-
+    NourishNet3 leverages blockchain technology to create a transparent and efficient system for food donations. 
+    The platform connects donors, recipients, and food providers, aiming to revolutionize the way we address food insecurity.
+  version: 0.1.0
+  license:
+    name: MIT
+    identifier: MIT
+types:
+  Donor:
+    summary: |-
+      Donor is an account that can exist multiple times per contract. 
+      It stores all the required information to manage food donations.
+    solana:
+      seeds:
+        - name: donor
+    fields:
+      - name: delegate
+        type: sol:pubkey
+        description: Only this delegate can modify the Donor account.
+      - name: total_donations
+        type: u128
+        description: The total amount donated by the donor.
+      - name: active_donations
+        type: u128
+        description: The current active donation amount.
+      - name: reward_points
+        type: u128
+        description: Reward points earned through donations.
+      - name: fee
+        type: u8
+        description: The fee percentage for processing donations.
+
+  FoodRequest:
+    summary: |-
+      FoodRequest is an account that will exist as many times as required
+      per recipient. It stores a request for food aid and if approved,
+      tracks the amount received.
+    solana:
+      seeds: 
+        - name: food_request
+        - name: recipient
+          type: sol:pubkey
+        - name: index
+          type: u32
+    fields:
+      - name: recipient
+        type: sol:pubkey
+        description: The recipient of the food aid.
+      - name: amount_requested
+        type: u64
+        description: The amount of aid requested.
+      - name: amount_received
+        type: u64
+        description: The amount of aid received.
+      - name: needs_verification_url
+        type: string
+        description: URL to the recipient's verification document as required.
+        solana:
+          attributes: [cap:96]
+      - name: approval_status
+        type: bool
+        description: Flag indicating if the request was approved by a donor.
+
+
+methods:
+  - name: create_donor
+    summary: |-
+      After deploying the contract, this must be the first instruction
+      to call. It will configure the donor account.
+    solana:
+      signers:
+        - name: fee_payer
+        - name: delegate
+    inputs:
+      - name: delegate
+        type: sol:account_info
+        description: This will be the account that has permission to update the donor and approve requests.
+        solana:
+          attributes: [ mut ]
+      - name: donor
+        type: Donor
+        solana:
+          attributes: [ init ]
+      - name: donation_amount
+        type: u64
+        description: The fee percentage for processing donations.
+      - name: fee
+        type: u8
+  - name: add_donation
+    summary: Adds a new donation to the donor account.
+    solana:
+      signers:
+        - name: fee_payer
+        - name: delegate
+    inputs:
+      - name: delegate
+        type: sol:account_info
+        solana:
+          attributes: [ mut ]
+      - name: donor
+        type: Donor
+        solana:
+          attributes: [ mut ]
+      - name: donation_amount
+        type: u64
+        description: The amount to be added to the total donations.
+  - name: request_food_aid
+    summary: A recipient can use this method to request food aid.
+    solana:
+      signers:
+        - name: fee_payer
+        - name: recipient
+    inputs:
+      - name: recipient
+        type: sol:account_info
+      - name: food_request
+        type: FoodRequest
+        solana:
+          attributes: [ init ]
+          seeds:
+            recipient: recipient
+      - name: donor
+        type: Donor
+      - name: amount_requested
+        type: u64
+        description: The requested amount of food aid.
+      - name: needs_verification_url
+        type: string
+        description: URL to the recipient's verification document.
+  - name: finalize_food_request
+    summary: |-
+      Finalize the food aid request and update the FoodRequest account.
+    solana:
+      signers:
+        - name: fee_payer
+        - name: delegate
+    inputs:
+      - name: delegate
+        type: sol:account_info
+        solana:
+          attributes: [ mut ]
+      - name: food_request
+        type: FoodRequest
+        solana:
+          attributes: [ mut ]
+          seeds:
+            recipient: recipient
+      - name: donor
+        type: Donor
+        solana:
+          attributes: [ mut ]
+      - name: recipient
+        type: sol:account_info
+        solana:
+          attributes: [ mut ]
+  - name: update_donor_info
+    summary: |-
+      Update donor information, including reward points and active donations.
+    solana:
+      signers:
+        - name: fee_payer
+        - name: delegate
+    inputs:
+      - name: delegate
+        type: sol:account_info
+        solana:
+          attributes: [ mut ] 
+      - name: donor
+        type: Donor
+        solana:
+          attributes: [ mut ]
+      - name: reward_points
+        type: u128 
+        description: Updated reward points for the donor.
+      - name: active_donations
+        type: u128
+        description: Updated active donation amount for the donor.
+        
