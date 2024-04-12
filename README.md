@@ -13,6 +13,8 @@ NourishNet3 is a revolutionary food aid platform leveraging blockchain technolog
 - Transparent food donation system
 - Donor and FoodRequest types for efficient management
 - Solana blockchain integration for decentralized processes
+## demo video
+link - https://youtu.be/u5WDtvHQisU
 
 ## Types
 ### Donor
